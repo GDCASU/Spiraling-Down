@@ -36,7 +36,7 @@ public class MagnetAttraction : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.name + " FOUND!");
+        //Debug.Log(other.name + " FOUND!");
         // Check if the collider is already cached
         if (cachedScripts.ContainsKey(other)) return; // It does, dont need to do anything
         

@@ -32,6 +32,7 @@ public class EntityScript : MonoBehaviour, IDamageable
     [SerializeField] private GameObject deathDeleteTarget;
     public FloatingHealthBar healthBar;
     public GameObject destroyOnDeath;
+    [SerializeField] EnemyDrop dropOnDeath;
     
     [Header("Data")]
     [SerializeField] private ScriptableEntity entityData;
@@ -151,7 +152,8 @@ public class EntityScript : MonoBehaviour, IDamageable
     /// </summary>
     private void OnDeath()
     {
-        // TODO: UNFINISHED
+        if (dropOnDeath != null) { dropOnDeath.DropOnDeath(); }
+        else { Debug.Log("No drops for " + gameObject.name); }
         Destroy(deathDeleteTarget);
     }
 

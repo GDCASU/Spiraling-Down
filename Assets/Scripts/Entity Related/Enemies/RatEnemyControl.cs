@@ -82,7 +82,7 @@ public class RatEnemyControl : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		Destroy(_target.gameObject);
+		if (_target != null) Destroy(_target.gameObject);
 	}
 
 	private void Update()

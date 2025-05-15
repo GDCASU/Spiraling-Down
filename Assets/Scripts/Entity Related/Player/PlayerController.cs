@@ -53,7 +53,6 @@ public class PlayerController : MonoBehaviour
     private readonly int IsMoving = Animator.StringToHash("isMoving");
     private readonly int IsMovingForward = Animator.StringToHash("isMovingForward");
     private readonly int IsAttacking = Animator.StringToHash("isAttacking");
-    private readonly int IsAttackingAndMoving = Animator.StringToHash("isAttackingAndMoving");
     
 	private void Start()
 	{
@@ -108,11 +107,13 @@ public class PlayerController : MonoBehaviour
         if (moveController.GetBool(IsMoving) && moveController.GetBool(IsAttacking))
         {
             // Is moving and attacking, set strafe
-            moveController.SetBool(IsAttackingAndMoving, true);
+            moveController.SetBool(IsAttacking, true);
+            moveController.SetBool(IsMoving, true);
         }
         else
         {
-            moveController.SetBool(IsAttackingAndMoving, false);
+            moveController.SetBool(IsAttacking, false);
+            moveController.SetBool(IsMoving, false);
         }
 
         //Set sprite direction
@@ -174,6 +175,16 @@ public class PlayerController : MonoBehaviour
         
         // Call the fire function on the ammo manager
         ammoManager.FireCurrentElement(transform.position, direction);
+
+        //Set sprite direction
+        if (direction.x < -0.01f)
+        {
+            playerRenderer.flipX = true;
+        }
+        else if (direction.x > 0.01f)
+        {
+            playerRenderer.flipX = false;
+        }
         moveController.SetBool(IsAttacking, true);
     }
 

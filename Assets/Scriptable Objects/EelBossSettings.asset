@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bf21e45943319e4196a3ae3a3d275b6, type: 3}
   m_Name: EelBossSettings
   m_EditorClassIdentifier: 
-  maxHealth: 0
+  maxHealth: 100
   damageMultiplier:
     neutralMultiplier: 1
     fungalMultiplier: 1

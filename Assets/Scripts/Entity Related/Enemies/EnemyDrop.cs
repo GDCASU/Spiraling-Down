@@ -48,7 +48,7 @@ public class EnemyDrop : MonoBehaviour
     }
 
     //goes through each drop and its chance, calls drop on success
-    public void OnDestroy()
+    public void DropOnDeath()
     {
         foreach (dropStuff i in dropList)
         {

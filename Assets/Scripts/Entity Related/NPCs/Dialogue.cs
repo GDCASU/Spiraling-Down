@@ -47,7 +47,10 @@ public class Dialogue : Interactable
     [SerializeField] private TextAsset script;
     TMP_Text dialogueText;
     public GameObject dialogueBackground;
+
+    // Timeline specific (not needed for other functions)
     [SerializeField] TimelinePlayer timelinePlayer;
+    [SerializeField] ResetPositionAnimation reset;
 
     [Header("Preset Options")]
     public string[] characterNames;
@@ -159,18 +162,28 @@ public class Dialogue : Interactable
         // Add change dialogue behavior to input system
         InputManager.OnChangeDialogue += ChangeDialogue;
         if (dialogueBackground != null) { dialogueBackground.SetActive(true); }
+        if (!finishedTyping) 
+        {
+            string previousLine = dialogue[currentLineNo][0] + ": " + dialogue[currentLineNo][1];
+            StopCoroutine(TypewriterText(previousLine));
+        }
         currentDialogCoroutine = StartCoroutine(TypewriterText(currentLine));
     }
 
     public void ChangeDialogue()
     {
         if (dialogue[currentLineNo+1] == null && currentLine == dialogueText.text) { ExitDialogue(); }
-        else if (currentLine == dialogueText.text) // If the typewriter effect has finished
+        else if (finishedTyping) // If the typewriter effect has finished
         {
             if (dialogue[currentLineNo + 1][0] == "BREAK") { isFirst = false; StartTimeline(); return; } // if an action
             currentLineNo++;
             currentLine = dialogue[currentLineNo][0] + ": " + dialogue[currentLineNo][1];
             StartCoroutine(TypewriterText(currentLine));
+        }
+        else // typewriter effect is not finished
+        {
+            finishedTyping = true;
+            dialogueText.text = currentLine;
         }
     }
 
@@ -196,12 +209,11 @@ public class Dialogue : Interactable
 
         float timer = 0;
         float interval = 0.001f * charactersPerSecond;
-        string textBuffer = null;
+        string textBuffer = "";
         char[] chars = line.ToCharArray();
         int i = 0;
         finishedTyping = false;
 
-        /*
         while (i < chars.Length && !finishedTyping)
         {
             if (timer > 0.01f)
@@ -217,11 +229,9 @@ public class Dialogue : Interactable
                 yield return null;
             }
         }
-        */
-        yield return new WaitForSeconds(0.1f);
-        dialogueText.text = line;
 
-        currentDialogCoroutine = null;
+        dialogueText.text = line;
+        finishedTyping = true;
     }
 
     /// <summary>  Takes information from text files and transfers into something the system can read </summary>
@@ -281,15 +291,26 @@ public class Dialogue : Interactable
 
     public void TimelineIsPaused()
     {
+        reset.ResetPosition();
         timelinePlaying = false;
-        timelinePlayer.EndTimelinePlayer();
         timeline.Pause();
+        timeline.playableGraph.GetRootPlayable(0).SetSpeed(0);
         TriggerEvent();
         InputManager.OnChangeDialogue += ChangeDialogue;
+        Time.timeScale = 0;
+    }
+
+    public void EndTimeline()
+    {
+        timelinePlaying = false;
+        timeline.Pause();
+        Time.timeScale = 1;
+        timelinePlayer.EndTimelinePlayer();
     }
 
     private void StartTimeline()
     {
+        Time.timeScale = 1;
         if (!isFirst)
         {
             timelinePlaying = true;
@@ -308,6 +329,7 @@ public class Dialogue : Interactable
             timelinePlayer.StartTimelinePlayer();
             timeline.Play();
             InputManager.OnChangeDialogue -= ChangeDialogue;
+            timeline.playableGraph.GetRootPlayable(0).SetSpeed(1);
         }
     }
 
